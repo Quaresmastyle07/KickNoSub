@@ -5,11 +5,11 @@ android {
     compileSdk 35
 
     defaultConfig {
-        applicationId 'de.fm.taktikboard'
+        applicationId 'de.fm.taktikboard.offline'
         minSdk 23
         targetSdk 35
-        versionCode 5
-        versionName '1.5.0'
+        versionCode 7
+        versionName '1.7.0'
     }
 
     signingConfigs {
@@ -35,7 +35,4 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.webkit:webkit:1.12.1'
-    implementation 'androidx.activity:activity:1.10.0'
 }
