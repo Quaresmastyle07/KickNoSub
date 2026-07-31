@@ -1,0 +1,41 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'de.fm.taktikboard'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'de.fm.taktikboard'
+        minSdk 23
+        targetSdk 35
+        versionCode 5
+        versionName '1.5.0'
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('fm-taktikboard-release.jks')
+            storePassword 'FMTaktikboard2026!'
+            keyAlias 'fm-taktikboard'
+            keyPassword 'FMTaktikboard2026!'
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+            enableV4Signing true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.activity:activity:1.10.0'
+}
