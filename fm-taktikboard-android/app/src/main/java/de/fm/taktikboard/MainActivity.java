@@ -96,7 +96,6 @@ public final class MainActivity extends Activity {
             if (savedInstanceState == null) {
                 webView.loadUrl(LOCAL_URL);
             } else {
-                WebView.WebViewTransport unused = null;
                 webView.restoreState(savedInstanceState);
                 if (webView.getUrl() == null) webView.loadUrl(LOCAL_URL);
             }
