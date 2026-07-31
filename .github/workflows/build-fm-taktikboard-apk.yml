@@ -1,0 +1,75 @@
+name: Build FM Taktikboard APK
+
+on:
+  pull_request:
+    paths:
+      - 'fm-taktikboard-android/**'
+      - '.github/workflows/build-fm-taktikboard-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform and build tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Generate private release keystore
+        working-directory: fm-taktikboard-android/app
+        run: |
+          keytool -genkeypair -v \
+            -keystore fm-taktikboard-release.jks \
+            -storepass 'FMTaktikboard2026!' \
+            -keypass 'FMTaktikboard2026!' \
+            -alias fm-taktikboard \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname 'CN=FM Taktikboard, OU=Private App, O=Yozgatspor Project, L=Yozgat, ST=Yozgat, C=TR'
+
+      - name: Build signed release APK
+        working-directory: fm-taktikboard-android
+        run: gradle --no-daemon clean :app:assembleRelease
+
+      - name: Verify APK signatures
+        run: |
+          APK='fm-taktikboard-android/app/build/outputs/apk/release/app-release.apk'
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          mkdir -p dist
+          cp "$APK" 'dist/FM_Taktikboard_Android_v1.5.0.apk'
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FM-Taktikboard-Android-v1.5.0
+          path: dist/FM_Taktikboard_Android_v1.5.0.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload Android signing verifier
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK-Signing-Tools-35
+          path: |
+            ${{ env.ANDROID_HOME }}/build-tools/35.0.0/apksigner
+            ${{ env.ANDROID_HOME }}/build-tools/35.0.0/lib/apksigner.jar
+            ${{ env.ANDROID_HOME }}/build-tools/35.0.0/zipalign
+          if-no-files-found: error
+          retention-days: 1
